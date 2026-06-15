@@ -78,7 +78,36 @@ function createGridTexture() {
     return texture;
 }
 
+function createBallTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Base color
+    ctx.fillStyle = '#ffff00';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Add some stripes/pattern to make rotation visible
+    ctx.strokeStyle = '#ffaa00';
+    ctx.lineWidth = 20;
+    for (let i = 0; i < 256; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 256);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(256, i);
+        ctx.stroke();
+    }
+
+    return new THREE.CanvasTexture(canvas);
+}
+
 const wallTexture = createGridTexture();
+const ballTexture = createBallTexture();
 
 // Arena (Visuals and Boundaries)
 const arenaMaterial = new THREE.MeshStandardMaterial({ 
@@ -139,8 +168,9 @@ spawnBricks();
 const ballGeo = new THREE.SphereGeometry(BALL_RADIUS, 32, 32);
 const ballMat = new THREE.MeshStandardMaterial({ 
     color: 0xffff00,
-    emissive: 0xffff00,
-    emissiveIntensity: 1.0
+    map: ballTexture,
+    emissive: 0x444400,
+    emissiveIntensity: 0.5
 });
 
 const balls = [];
@@ -436,9 +466,18 @@ function checkCollisions() {
 // Game Loop
 renderer.setAnimationLoop(() => {
     if (gameState === 'PLAYING') {
-        // Move balls
+        // Move and rotate balls
         for (let i = 0; i < balls.length; i++) {
-            balls[i].position.add(ballVelocities[i]);
+            const ball = balls[i];
+            const velocity = ballVelocities[i];
+            
+            ball.position.add(velocity);
+            
+            // Rotate ball to make spinning visible
+            // Use a simple rotation based on movement
+            ball.rotation.x += velocity.z * 2;
+            ball.rotation.y += velocity.x * 2;
+            ball.rotation.z += velocity.y * 2;
         }
         checkCollisions();
     }
