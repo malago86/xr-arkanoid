@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XR Arkanoid 3D</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: sans-serif;
+            font-size: 24px;
+            pointer-events: none;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        #start-btn {
+            padding: 20px 40px;
+            font-size: 32px;
+            cursor: pointer;
+            background: #00ffaa;
+            border: none;
+            border-radius: 10px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+        #countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: sans-serif;
+            font-size: 120px;
+            display: none;
+            pointer-events: none;
+        }
+        #cheats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: sans-serif;
+            font-size: 14px;
+            text-align: right;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">Score: 0 | Time: 05:00</div>
+    <div id="overlay">
+        <button id="start-btn">START GAME</button>
+    </div>
+    <div id="countdown">5</div>
+    <!-- <div id="cheats">
+        Cheats:<br>
+        [R] Restart Game<br>
+        [K] Delete All Blocks
+    </div> -->
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
