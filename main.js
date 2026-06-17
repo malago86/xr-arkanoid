@@ -321,10 +321,10 @@ function updateVRUI() {
     vrUITexture.needsUpdate = true;
 }
 
-function updateVRCountdown(text) {
+function updateVRCountdown(text, size=120) {
     vrCountdownCtx.clearRect(0, 0, vrCountdownCanvas.width, vrCountdownCanvas.height);
     vrCountdownCtx.fillStyle = 'white';
-    vrCountdownCtx.font = 'bold 120px Arial';
+    vrCountdownCtx.font = 'bold ' + size + 'px Arial';
     vrCountdownCtx.textAlign = 'center';
     vrCountdownCtx.textBaseline = 'middle';
     vrCountdownCtx.fillText(text, vrCountdownCanvas.width / 2, vrCountdownCanvas.height / 2);
@@ -387,6 +387,33 @@ function startGame() {
 
 startBtn.addEventListener('click', startGame);
 
+function resetGame() {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    score = 0;
+    gameTimeLeft = GAME_DURATION;
+    gameState = 'WAITING';
+    startButtonFill3D.visible = false;
+    startButtonFill3D.scale.x = 0;
+    
+    // Clear balls
+    balls.forEach(b => scene.remove(b));
+    balls.length = 0;
+    ballVelocities.length = 0;
+    
+    // Clear bricks
+    bricks.forEach(b => scene.remove(b));
+    bricks.length = 0;
+    
+    // Reset UI
+    overlay.style.display = 'flex';
+    startButton3D.visible = true;
+    updateUI();
+    
+    // Respawn bricks for fresh start
+    spawnBricks();
+}
+
 function endGame() {
     gameState = 'GAMEOVER';
     bgMusic.pause();
@@ -404,6 +431,9 @@ function endGame() {
     balls.forEach(b => scene.remove(b));
     balls.length = 0;
     ballVelocities.length = 0;
+
+    // Go back to start screen after 20 seconds
+    setTimeout(resetGame, 20000);
 }
 
 function relaunchBall() {
@@ -438,7 +468,7 @@ function handleLevelComplete() {
     countdownEl.innerText = 'LEVEL CLEAR!';
     
     vrCountdownMesh.visible = true;
-    updateVRCountdown('LEVEL CLEAR!');
+    updateVRCountdown('LEVEL CLEAR!', 30);
     
     // Remove all balls
     balls.forEach(b => scene.remove(b));
@@ -649,31 +679,7 @@ window.addEventListener('keydown', (event) => {
     const key = event.key.toUpperCase();
     
     if (key === 'R') {
-        // Restart Game Completely
-        bgMusic.pause();
-        bgMusic.currentTime = 0;
-        score = 0;
-        gameTimeLeft = GAME_DURATION;
-        gameState = 'WAITING';
-        startButtonFill3D.visible = false;
-        startButtonFill3D.scale.x = 0;
-        
-        // Clear balls
-        balls.forEach(b => scene.remove(b));
-        balls.length = 0;
-        ballVelocities.length = 0;
-        
-        // Clear bricks
-        bricks.forEach(b => scene.remove(b));
-        bricks.length = 0;
-        
-        // Reset UI
-        overlay.style.display = 'flex';
-        startButton3D.visible = true;
-        updateUI();
-        
-        // Respawn bricks for fresh start
-        spawnBricks();
+        resetGame();
         console.log('Game Restarted');
     }
     
