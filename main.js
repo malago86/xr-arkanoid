@@ -126,20 +126,27 @@ scene.add(grid);
 
 // Bricks
 const bricks = [];
-const brickGeo = new THREE.BoxGeometry(0.6, 0.3, 0.3);
 const brickMaterial = new THREE.MeshStandardMaterial({ color: 0xff0055 });
 const specialBrickMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 }); // Gold color
 
 function spawnBricks() {
+    // Calculate dynamic brick dimensions based on arena size
+    const brickWidth = ARENA_WIDTH / BRICK_COLS;
+    const brickHeight = ARENA_HEIGHT / BRICK_ROWS;
+    const brickDepth = (ARENA_DEPTH / 2) / BRICK_SLICES;
+    const gap = 0.05;
+
+    const brickGeo = new THREE.BoxGeometry(brickWidth - gap, brickHeight - gap, brickDepth - gap);
+
     for (let s = 0; s < BRICK_SLICES; s++) {
         const sliceBricks = [];
         for (let r = 0; r < BRICK_ROWS; r++) {
             for (let c = 0; c < BRICK_COLS; c++) {
                 const brick = new THREE.Mesh(brickGeo, brickMaterial);
                 brick.position.set(
-                    (c - (BRICK_COLS - 1) / 2) * 0.7,
-                    ARENA_HEIGHT - 0.5 - r * 0.4,
-                    -ARENA_DEPTH + 0.5 + s * 0.5
+                    (c - (BRICK_COLS - 1) / 2) * brickWidth,
+                    ARENA_HEIGHT - (r + 0.5) * brickHeight,
+                    -ARENA_DEPTH + (s + 0.5) * brickDepth
                 );
                 brick.isSpecial = false;
                 scene.add(brick);
@@ -481,7 +488,13 @@ function checkCollisions() {
             const dy = Math.abs(ball.position.y - brick.position.y);
             const dz = Math.abs(ball.position.z - brick.position.z);
 
-            if (dx < (0.6 / 2 + BALL_RADIUS) && dy < (0.3 / 2 + BALL_RADIUS) && dz < (0.3 / 2 + BALL_RADIUS)) {
+            const brickSize = new THREE.Vector3();
+            brick.geometry.computeBoundingBox();
+            const boundingBox = brick.geometry.boundingBox;
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+
+            if (dx < (size.x / 2 + BALL_RADIUS) && dy < (size.y / 2 + BALL_RADIUS) && dz < (size.z / 2 + BALL_RADIUS)) {
                 // Reflect
                 if (dx > dy && dx > dz) ballVelocity.x *= -1;
                 else if (dy > dx && dy > dz) ballVelocity.y *= -1;
