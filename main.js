@@ -19,7 +19,7 @@ const breakSound = new Audio('break.mp3');
 const paddleSound = new Audio('paddle.mp3');
 const bgMusic = new Audio('music.mp3');
 bgMusic.loop = true;
-bgMusic.volume = 0.4;
+bgMusic.volume = 0.2;
 
 function playSound(sound) {
     sound.currentTime = 0;
@@ -29,6 +29,7 @@ function playSound(sound) {
 let score = 0;
 let gameState = 'WAITING'; // WAITING, COUNTDOWN, PLAYING, GAMEOVER, LEVEL_COMPLETE
 let gameTimeLeft = GAME_DURATION;
+let startButtonHoldStartTime = 0;
 let countdownValue = 5;
 let ballCountdownValue = 5;
 
@@ -216,6 +217,13 @@ const startButton3D = new THREE.Mesh(btnGeo, btnMat);
 startButton3D.position.set(0, 1.2, -0.5);
 scene.add(startButton3D);
 
+const fillMat = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+const startButtonFill3D = new THREE.Mesh(btnGeo, fillMat);
+startButtonFill3D.position.set(0, 1.2, -0.49); // Slightly in front to avoid z-fighting
+startButtonFill3D.scale.set(0, 1, 1);
+startButtonFill3D.visible = false;
+scene.add(startButtonFill3D);
+
 // Initial Ball (Now handled by startGame)
 // Mouse Paddle (Fallback for non-VR)
 const paddleGeo = new THREE.BoxGeometry(0.8, 0.2, 0.1);
@@ -341,6 +349,7 @@ function startGame() {
     bgMusic.play().catch(e => console.log("Music playback failed:", e));
     overlay.style.display = 'none';
     startButton3D.visible = false;
+    startButtonFill3D.visible = false;
     gameState = 'COUNTDOWN';
     countdownValue = 5;
     countdownEl.style.display = 'block';
@@ -380,6 +389,7 @@ startBtn.addEventListener('click', startGame);
 
 function endGame() {
     gameState = 'GAMEOVER';
+    bgMusic.pause();
     uiElement.innerText = `GAME OVER! Final Score: ${score}`;
     
     // Update VR UI for game over
@@ -592,12 +602,36 @@ renderer.setAnimationLoop(() => {
 
     // Check VR button interaction
     if (gameState === 'WAITING') {
+        let isTouching = false;
         handMeshes.forEach(hand => {
             const handPos = hand.getWorldPosition(new THREE.Vector3());
             if (handPos.distanceTo(startButton3D.position) < HAND_RADIUS + 0.2) {
-                startGame();
+                isTouching = true;
             }
         });
+
+        if (isTouching) {
+            startButtonFill3D.visible = true;
+            if (startButtonHoldStartTime === 0) {
+                startButtonHoldStartTime = performance.now();
+            }
+            
+            const elapsed = performance.now() - startButtonHoldStartTime;
+            const progress = Math.min(elapsed / 3000, 1);
+            
+            // Update fill scale and position to move from left to right
+            startButtonFill3D.scale.x = progress;
+            startButtonFill3D.position.x = (startButton3D.position.x - 0.2) + (progress * 0.2);
+
+            if (elapsed >= 3000) {
+                startGame();
+                startButtonHoldStartTime = 0;
+            }
+        } else {
+            startButtonHoldStartTime = 0;
+            startButtonFill3D.visible = false;
+            startButtonFill3D.scale.x = 0;
+        }
     }
 
     renderer.render(scene, camera);
@@ -616,9 +650,13 @@ window.addEventListener('keydown', (event) => {
     
     if (key === 'R') {
         // Restart Game Completely
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
         score = 0;
         gameTimeLeft = GAME_DURATION;
         gameState = 'WAITING';
+        startButtonFill3D.visible = false;
+        startButtonFill3D.scale.x = 0;
         
         // Clear balls
         balls.forEach(b => scene.remove(b));
