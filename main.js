@@ -283,8 +283,7 @@ const vrUITexture = new THREE.CanvasTexture(vrUICanvas);
 const vrUIGeo = new THREE.PlaneGeometry(2, 0.5);
 const vrUIMat = new THREE.MeshBasicMaterial({ map: vrUITexture, transparent: true, side: THREE.DoubleSide });
 const vrUIMesh = new THREE.Mesh(vrUIGeo, vrUIMat);
-vrUIMesh.position.set(0, ARENA_HEIGHT - 0.1, -1); // Positioned above the arena
-vrUIMesh.rotation.y = Math.PI; // Face the user
+vrUIMesh.position.set(0, ARENA_HEIGHT - 0.05, -1); // Positioned above the arena
 scene.add(vrUIMesh);
 
 const vrCountdownCanvas = document.createElement('canvas');
@@ -303,8 +302,8 @@ function updateVRUI() {
     // Main UI
     vrUICtx.clearRect(0, 0, vrUICanvas.width, vrUICanvas.height);
     vrUICtx.fillStyle = 'white';
-    vrUICtx.font = 'bold 40px Arial';
-    vrUICtx.textAlign = 'center';
+    vrUICtx.font = 'bold 20px Arial';
+    vrUICtx.textAlign = 'left';
     
     const minutes = Math.floor(gameTimeLeft / 60);
     const seconds = gameTimeLeft % 60;
