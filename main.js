@@ -423,9 +423,10 @@ function endGame() {
     // Update VR UI for game over
     vrUICtx.clearRect(0, 0, vrUICanvas.width, vrUICanvas.height);
     vrUICtx.fillStyle = 'white';
-    vrUICtx.font = 'bold 30px Arial';
+    vrUICtx.font = 'bold 40px Arial';
     vrUICtx.textAlign = 'center';
-    vrUICtx.fillText(`GAME OVER! Final Score: ${score}`, vrUICanvas.width / 2, vrUICanvas.height / 2 + 15);
+    vrUICtx.fillText(`GAME OVER!`, vrUICanvas.width / 2, vrUICanvas.height / 2 - 10);
+    vrUICtx.fillText(`Final Score: ${score}`, vrUICanvas.width / 2, vrUICanvas.height / 2 + 40);
     vrUITexture.needsUpdate = true;
 
     // Remove all balls
