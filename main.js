@@ -324,14 +324,19 @@ function startGame() {
     countdownValue = 5;
     countdownEl.style.display = 'block';
     countdownEl.innerText = countdownValue;
+    
+    vrCountdownMesh.visible = true;
+    updateVRCountdown(countdownValue);
 
     const countdownInterval = setInterval(() => {
         countdownValue--;
         if (countdownValue > 0) {
             countdownEl.innerText = countdownValue;
+            updateVRCountdown(countdownValue);
         } else {
             clearInterval(countdownInterval);
             countdownEl.style.display = 'none';
+            vrCountdownMesh.visible = false;
             gameState = 'PLAYING';
             createBall(new THREE.Vector3(0, 1, -1), new THREE.Vector3(0, 0, -BALL_SPEED));
             
@@ -355,6 +360,15 @@ startBtn.addEventListener('click', startGame);
 function endGame() {
     gameState = 'GAMEOVER';
     uiElement.innerText = `GAME OVER! Final Score: ${score}`;
+    
+    // Update VR UI for game over
+    vrUICtx.clearRect(0, 0, vrUICanvas.width, vrUICanvas.height);
+    vrUICtx.fillStyle = 'white';
+    vrUICtx.font = 'bold 40px Arial';
+    vrUICtx.textAlign = 'center';
+    vrUICtx.fillText(`GAME OVER! Final Score: ${score}`, vrUICanvas.width / 2, vrUICanvas.height / 2 + 15);
+    vrUITexture.needsUpdate = true;
+
     // Remove all balls
     balls.forEach(b => scene.remove(b));
     balls.length = 0;
@@ -366,14 +380,19 @@ function relaunchBall() {
     ballCountdownValue = 5;
     countdownEl.style.display = 'block';
     countdownEl.innerText = ballCountdownValue;
+    
+    vrCountdownMesh.visible = true;
+    updateVRCountdown(ballCountdownValue);
 
     const relaunchInterval = setInterval(() => {
         ballCountdownValue--;
         if (ballCountdownValue > 0) {
             countdownEl.innerText = ballCountdownValue;
+            updateVRCountdown(ballCountdownValue);
         } else {
             clearInterval(relaunchInterval);
             countdownEl.style.display = 'none';
+            vrCountdownMesh.visible = false;
             gameState = 'PLAYING';
             createBall(new THREE.Vector3(0, 1, -1), new THREE.Vector3(0, 0, -BALL_SPEED));
         }
@@ -387,6 +406,9 @@ function handleLevelComplete() {
     countdownEl.style.display = 'block';
     countdownEl.innerText = 'LEVEL CLEAR!';
     
+    vrCountdownMesh.visible = true;
+    updateVRCountdown('LEVEL CLEAR!');
+    
     // Remove all balls
     balls.forEach(b => scene.remove(b));
     balls.length = 0;
@@ -398,14 +420,17 @@ function handleLevelComplete() {
         
         ballCountdownValue = 5;
         countdownEl.innerText = ballCountdownValue;
+        updateVRCountdown(ballCountdownValue);
         
         const levelInterval = setInterval(() => {
             ballCountdownValue--;
             if (ballCountdownValue > 0) {
                 countdownEl.innerText = ballCountdownValue;
+                updateVRCountdown(ballCountdownValue);
             } else {
                 clearInterval(levelInterval);
                 countdownEl.style.display = 'none';
+                vrCountdownMesh.visible = false;
                 spawnBricks();
                 gameState = 'PLAYING';
                 createBall(new THREE.Vector3(0, 1, -1), new THREE.Vector3(0, 0, -BALL_SPEED));
