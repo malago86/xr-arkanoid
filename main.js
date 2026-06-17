@@ -19,6 +19,7 @@ const breakSound = new Audio('break.mp3');
 const paddleSound = new Audio('paddle.mp3');
 const bgMusic = new Audio('music.mp3');
 bgMusic.loop = true;
+bgMusic.volume = 0.4;
 
 function playSound(sound) {
     sound.currentTime = 0;
