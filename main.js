@@ -10,6 +10,7 @@ const BRICK_COLS = 5;
 const BRICK_SLICES = 5;
 const BALL_RADIUS = 0.1;
 const BALL_SPEED = 0.05;
+const MIN_Z_SPEED = 0.02;
 const HAND_RADIUS = 0.15;
 const GAME_DURATION = 5 * 60; // 5 minutes in seconds
 
@@ -422,7 +423,7 @@ function endGame() {
     // Update VR UI for game over
     vrUICtx.clearRect(0, 0, vrUICanvas.width, vrUICanvas.height);
     vrUICtx.fillStyle = 'white';
-    vrUICtx.font = 'bold 40px Arial';
+    vrUICtx.font = 'bold 30px Arial';
     vrUICtx.textAlign = 'center';
     vrUICtx.fillText(`GAME OVER! Final Score: ${score}`, vrUICanvas.width / 2, vrUICanvas.height / 2 + 15);
     vrUITexture.needsUpdate = true;
@@ -524,6 +525,7 @@ function checkCollisions() {
         // Z-axis (Far wall)
         if (ball.position.z < -ARENA_DEPTH + BALL_RADIUS) {
             ballVelocity.z *= -1;
+            ballVelocity.z = Math.sign(ballVelocity.z) * Math.max(Math.abs(ballVelocity.z), MIN_Z_SPEED);
             ball.position.z = -ARENA_DEPTH + BALL_RADIUS;
             playSound(bounceSound);
         }
@@ -555,7 +557,10 @@ function checkCollisions() {
                 // Reflect
                 if (dx > dy && dx > dz) ballVelocity.x *= -1;
                 else if (dy > dx && dy > dz) ballVelocity.y *= -1;
-                else ballVelocity.z *= -1;
+                else {
+                    ballVelocity.z *= -1;
+                    ballVelocity.z = Math.sign(ballVelocity.z) * Math.max(Math.abs(ballVelocity.z), MIN_Z_SPEED);
+                }
 
                 if (brick.isSpecial) {
                     // Generate a new ball with slightly randomized velocity
@@ -588,6 +593,7 @@ function checkCollisions() {
                 const normal = new THREE.Vector3().subVectors(ball.position, hand.getWorldPosition(new THREE.Vector3())).normalize();
                 ballVelocity.reflect(normal);
                 if (ballVelocity.z > 0) ballVelocity.z *= -1;
+                ballVelocity.z = Math.sign(ballVelocity.z) * Math.max(Math.abs(ballVelocity.z), MIN_Z_SPEED);
             }
         });
 
@@ -601,6 +607,7 @@ function checkCollisions() {
                 if (dx < (0.8 / 2 + BALL_RADIUS) && dy < (0.2 / 2 + BALL_RADIUS) && dz < (0.1 / 2 + BALL_RADIUS)) {
                     playSound(paddleSound);
                     ballVelocity.z *= -1;
+                    ballVelocity.z = Math.sign(ballVelocity.z) * Math.max(Math.abs(ballVelocity.z), MIN_Z_SPEED);
                     ball.position.z = mousePaddle.position.z - (0.1 / 2 + BALL_RADIUS);
                     ballVelocity.x += (ball.position.x - mousePaddle.position.x) * 0.1;
                     ballVelocity.y += (ball.position.y - mousePaddle.position.y) * 0.1;
