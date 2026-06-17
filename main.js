@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 // Game Constants
-const ARENA_WIDTH = 4;
-const ARENA_HEIGHT = 3;
+const ARENA_WIDTH = 3;
+const ARENA_HEIGHT = 2;
 const ARENA_DEPTH = 10;
 const BRICK_ROWS = 6;
 const BRICK_COLS = 5;
@@ -254,11 +254,61 @@ const overlay = document.getElementById('overlay');
 const startBtn = document.getElementById('start-btn');
 const countdownEl = document.getElementById('countdown');
 
+// VR UI elements
+const vrUICanvas = document.createElement('canvas');
+vrUICanvas.width = 512;
+vrUICanvas.height = 128;
+const vrUICtx = vrUICanvas.getContext('2d');
+const vrUITexture = new THREE.CanvasTexture(vrUICanvas);
+const vrUIGeo = new THREE.PlaneGeometry(2, 0.5);
+const vrUIMat = new THREE.MeshBasicMaterial({ map: vrUITexture, transparent: true });
+const vrUIMesh = new THREE.Mesh(vrUIGeo, vrUIMat);
+vrUIMesh.position.set(0, ARENA_HEIGHT + 0.2, -1); // Positioned above the arena
+scene.add(vrUIMesh);
+
+const vrCountdownCanvas = document.createElement('canvas');
+vrCountdownCanvas.width = 256;
+vrCountdownCanvas.height = 256;
+const vrCountdownCtx = vrCountdownCanvas.getContext('2d');
+const vrCountdownTexture = new THREE.CanvasTexture(vrCountdownCanvas);
+const vrCountdownGeo = new THREE.PlaneGeometry(0.5, 0.5);
+const vrCountdownMat = new THREE.MeshBasicMaterial({ map: vrCountdownTexture, transparent: true });
+const vrCountdownMesh = new THREE.Mesh(vrCountdownGeo, vrCountdownMat);
+vrCountdownMesh.position.set(0, 1.5, -1);
+vrCountdownMesh.visible = false;
+scene.add(vrCountdownMesh);
+
+function updateVRUI() {
+    // Main UI
+    vrUICtx.clearRect(0, 0, vrUICanvas.width, vrUICanvas.height);
+    vrUICtx.fillStyle = 'white';
+    vrUICtx.font = 'bold 40px Arial';
+    vrUICtx.textAlign = 'center';
+    
+    const minutes = Math.floor(gameTimeLeft / 60);
+    const seconds = gameTimeLeft % 60;
+    const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const text = `Score: ${score} | Time: ${timeStr}`;
+    vrUICtx.fillText(text, vrUICanvas.width / 2, vrUICanvas.height / 2 + 15);
+    vrUITexture.needsUpdate = true;
+}
+
+function updateVRCountdown(text) {
+    vrCountdownCtx.clearRect(0, 0, vrCountdownCanvas.width, vrCountdownCanvas.height);
+    vrCountdownCtx.fillStyle = 'white';
+    vrCountdownCtx.font = 'bold 120px Arial';
+    vrCountdownCtx.textAlign = 'center';
+    vrCountdownCtx.textBaseline = 'middle';
+    vrCountdownCtx.fillText(text, vrCountdownCanvas.width / 2, vrCountdownCanvas.height / 2);
+    vrCountdownTexture.needsUpdate = true;
+}
+
 function updateUI() {
     const minutes = Math.floor(gameTimeLeft / 60);
     const seconds = gameTimeLeft % 60;
     const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     uiElement.innerText = `Score: ${score} | Time: ${timeStr}`;
+    updateVRUI();
 }
 
 function updateScore() {
