@@ -13,6 +13,18 @@ const BALL_SPEED = 0.05;
 const HAND_RADIUS = 0.15;
 const GAME_DURATION = 5 * 60; // 5 minutes in seconds
 
+// Audio
+const bounceSound = new Audio('bounce.mp3');
+const breakSound = new Audio('break.mp3');
+const paddleSound = new Audio('paddle.mp3');
+const bgMusic = new Audio('music.mp3');
+bgMusic.loop = true;
+
+function playSound(sound) {
+    sound.currentTime = 0;
+    sound.play().catch(e => console.log("Audio playback failed:", e));
+}
+
 let score = 0;
 let gameState = 'WAITING'; // WAITING, COUNTDOWN, PLAYING, GAMEOVER, LEVEL_COMPLETE
 let gameTimeLeft = GAME_DURATION;
@@ -325,6 +337,7 @@ function updateScore() {
 function startGame() {
     if (gameState !== 'WAITING') return;
     
+    bgMusic.play().catch(e => console.log("Music playback failed:", e));
     overlay.style.display = 'none';
     startButton3D.visible = false;
     gameState = 'COUNTDOWN';
@@ -459,16 +472,19 @@ function checkCollisions() {
         if (Math.abs(ball.position.x) > (ARENA_WIDTH / 2) - BALL_RADIUS) {
             ballVelocity.x *= -1;
             ball.position.x = Math.sign(ball.position.x) * ((ARENA_WIDTH / 2) - BALL_RADIUS);
+            playSound(bounceSound);
         }
         // Y-axis
         if (ball.position.y > ARENA_HEIGHT - BALL_RADIUS || ball.position.y < BALL_RADIUS) {
             ballVelocity.y *= -1;
             ball.position.y = ball.position.y < BALL_RADIUS ? BALL_RADIUS : ARENA_HEIGHT - BALL_RADIUS;
+            playSound(bounceSound);
         }
         // Z-axis (Far wall)
         if (ball.position.z < -ARENA_DEPTH + BALL_RADIUS) {
             ballVelocity.z *= -1;
             ball.position.z = -ARENA_DEPTH + BALL_RADIUS;
+            playSound(bounceSound);
         }
         // Z-axis (Player death zone)
         if (ball.position.z > 0) {
@@ -510,6 +526,7 @@ function checkCollisions() {
                     createBall(ball.position.clone(), newVel);
                 }
 
+                playSound(breakSound);
                 scene.remove(brick);
                 bricks.splice(i, 1);
                 score += 10;
@@ -526,6 +543,7 @@ function checkCollisions() {
         handMeshes.forEach(hand => {
             const dist = ball.position.distanceTo(hand.getWorldPosition(new THREE.Vector3()));
             if (dist < BALL_RADIUS + HAND_RADIUS) {
+                playSound(paddleSound);
                 const normal = new THREE.Vector3().subVectors(ball.position, hand.getWorldPosition(new THREE.Vector3())).normalize();
                 ballVelocity.reflect(normal);
                 if (ballVelocity.z > 0) ballVelocity.z *= -1;
@@ -540,6 +558,7 @@ function checkCollisions() {
                 const dz = Math.abs(ball.position.z - mousePaddle.position.z);
 
                 if (dx < (0.8 / 2 + BALL_RADIUS) && dy < (0.2 / 2 + BALL_RADIUS) && dz < (0.1 / 2 + BALL_RADIUS)) {
+                    playSound(paddleSound);
                     ballVelocity.z *= -1;
                     ball.position.z = mousePaddle.position.z - (0.1 / 2 + BALL_RADIUS);
                     ballVelocity.x += (ball.position.x - mousePaddle.position.x) * 0.1;
