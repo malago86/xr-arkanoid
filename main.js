@@ -281,9 +281,10 @@ vrUICanvas.height = 128;
 const vrUICtx = vrUICanvas.getContext('2d');
 const vrUITexture = new THREE.CanvasTexture(vrUICanvas);
 const vrUIGeo = new THREE.PlaneGeometry(2, 0.5);
-const vrUIMat = new THREE.MeshBasicMaterial({ map: vrUITexture, transparent: true });
+const vrUIMat = new THREE.MeshBasicMaterial({ map: vrUITexture, transparent: true, side: THREE.DoubleSide });
 const vrUIMesh = new THREE.Mesh(vrUIGeo, vrUIMat);
 vrUIMesh.position.set(0, ARENA_HEIGHT + 0.2, -1); // Positioned above the arena
+vrUIMesh.rotation.y = Math.PI; // Face the user
 scene.add(vrUIMesh);
 
 const vrCountdownCanvas = document.createElement('canvas');
