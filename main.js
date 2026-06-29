@@ -12,7 +12,7 @@ const BALL_RADIUS = 0.1;
 const BALL_SPEED = 0.05;
 const MIN_Z_SPEED = 0.02;
 const HAND_RADIUS = 0.15;
-const GAME_DURATION = 5 * 60; // 5 minutes in seconds
+const GAME_DURATION = 3 * 60; // 3 minutes in seconds
 
 // Audio
 const bounceSound = new Audio('bounce.mp3');
