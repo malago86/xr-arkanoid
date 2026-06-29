@@ -39,7 +39,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111122);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 1.6, 1); // Moved back to see the paddle and arena
+camera.position.set(0, 2 * ARENA_HEIGHT / 3, 1); // Moved back to see the paddle and arena
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
