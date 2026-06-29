@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 // Game Constants
-const ARENA_WIDTH = 3;
-const ARENA_HEIGHT = 2;
+const ARENA_WIDTH = 2;
+const ARENA_HEIGHT = 1.5;
 const ARENA_DEPTH = 10;
 const BRICK_ROWS = 6;
 const BRICK_COLS = 5;
