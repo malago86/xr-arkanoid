@@ -303,7 +303,7 @@ const vrCountdownTexture = new THREE.CanvasTexture(vrCountdownCanvas);
 const vrCountdownGeo = new THREE.PlaneGeometry(0.5, 0.5);
 const vrCountdownMat = new THREE.MeshBasicMaterial({ map: vrCountdownTexture, transparent: true });
 const vrCountdownMesh = new THREE.Mesh(vrCountdownGeo, vrCountdownMat);
-vrCountdownMesh.position.set(0, 1.5, -1);
+vrCountdownMesh.position.set(0, 2 * ARENA_HEIGHT / 3, -1);
 vrCountdownMesh.visible = false;
 scene.add(vrCountdownMesh);
 
